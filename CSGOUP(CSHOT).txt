@@ -1,0 +1,134 @@
+apt-get update
+apt-get install sudo
+
+sudo apt-get update
+apt-get install bsdutils
+apt-get install curl
+sudo apt-get install -y build-essential
+sudo apt-get install -y python-software-properties
+sudo apt-get install -y php5
+sudo apt-get install -y apache2
+sudo apt-get install -y libapache2-mod-php5
+sudo apt-get install -y mysql-server
+sudo apt-get install -y php5-mysql
+sudo apt-get install -y php5-curl
+sudo apt-get install -y php5-gd
+sudo apt-get install -y php5-mcrypt
+sudo apt-get install -y git-core
+sudo apt-get install -y phpmyadmin
+apt-get install unzip
+
+curl --silent --location https://deb.nodesource.com/setup_0.12 | bash -
+apt-get install --yes nodejs
+apt-get install --yes build-essential
+
+sudo a2enmod rewrite
+
+sudo /etc/init.d/apache2 restart
+
+curl -sS https://getcomposer.org/installer | php
+sudo mv composer.phar /usr/local/bin/composer
+
+sudo apt-get update
+sudo apt-get install tcl8.5
+
+wget http://download.redis.io/releases/redis-stable.tar.gz
+tar xzf redis-stable.tar.gz
+cd redis-stable
+make
+make test
+sudo make install
+cd utils
+sudo ./install_server.sh
+
+Идём в /etc/apache2/sites-available
+Меняем DocumentRoot /var/www/html на DocumentRoot /var/www/html/public
+
+#
+echo "Include /etc/phpmyadmin/apache.conf" | sudo tee -a /etc/apache2/apache2.conf
+#
+
+Идем в
+/etc/redis/6379.conf
+
+Ищем:
+#bind 127.0.0.1
+Заменяем на:
+bind 127.0.0.1
+
+Перезагружаем редис командой:
+service redis_6379 restart
+service apache2 restart
+
+######ЗАПУСК БОТА#######
+Установка команд (Выполняется один раз):
+npm install pm2 -g
+pm2 startup
+Запуск бота:
+cd /bot
+pm2 start app.js
+
+pm2 logs 0 (Посмотреть что пишет бот, что бы выйти из логов CTRL+C)
+pm2 restart 0 (Рестарт бота)
+pm2 stop 0 (Выключить бота)
+######РЕШЕНИЕ ПРОБЛЕМ########
+Проблема: Sub-process /usr/bin/dpkg returned an error code (1)
+Решение (1):
+sudo aptitude update
+sudo aptitude install -f
+sudo aptitude safe-upgrade
+sudo dpkg --configure -a
+Решение (2):
+sudo dpkg-reconfigure -a 
+Решение (3):
+sudo dpkg --configure -a  или sudo apt-get install -f && sudo dpkg --configure -a
+sudo apt-get update
+sudo apt-get upgrade
+sudo dpkg --clear-avail
+sudo apt-get update
+apt-get remove scim
+####
+Проблема: sudo: command not found
+Решение: apt-get install sudo
+###
+//Размер БД /etc/php5/apache2
+
+; Maximum allowed size for uploaded files.
+upload_max_filesize = 200M
+
+; Maximum size of POST data that PHP will accept.
+post_max_size = 200M
+
+; Maximum execution time of each script, in seconds
+max_execution_time = 600
+
+; Maximum amount of time each script may spend parsing request data
+max_input_time = 600
+
+; Maximum amount of memory a script may consume (128MB)
+memory_limit = 500M
+
+service apache2 restart
+###
+Рано обрадовался :с
+Основная страница загрузилась, но при переходе на друге или при логине вылазит страница:
+
+
+Not Found
+The requested URL /history was not found on this server.
+
+
+# Включение mod_rewrite
+sudo a2enmod rewrite
+
+# Кофиг апача:
+/etc/apache2/apache2.conf
+
+Код:
+<Directory /var/www/>
+Options Indexes FollowSymLinks
+AllowOverride None(меняем на All)
+Require all granted
+</Directory>
+# Перезапустим apache для принятия изменений
+sudo /etc/init.d/apache2 restart
